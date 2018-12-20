@@ -1,12 +1,12 @@
 
 # Copyright 2018 Michael DeHaan LLC, <michael@michaeldehaan.net>
-# 
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
 #    http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -21,22 +21,12 @@ from colorama import init as colorama_init
 
 from opsmop.callbacks.callbacks import Callbacks
 from opsmop.callbacks.common import CommonCallbacks
-from opsmop.callbacks.event_stream import EventStreamCallbacks
 from opsmop.callbacks.local import LocalCliCallbacks
 from opsmop.core.api import Api
 from opsmop.core.context import Context
 from opsmop.core.errors import OpsMopError, OpsMopStop
 from opsmop.core.common import load_data_file, shlex_kv
 
-USAGE = """
-|
-| opsmop - (C) 2018, Michael DeHaan LLC
-|
-| opsmop --validate demo/policy.py 
-| opsmop --check demo/policy.py [--local|--push]
-| opsmop --apply demo/policy.py [--local|--push]
-|
-"""
 
 class Cli(object):
 
@@ -52,55 +42,41 @@ class Cli(object):
         data = None
         # TODO: make some functions in common that do this generically
         if extra_vars.startswith("@"):
-            extra_vars = extra_vars.replace("@","")
+            extra_vars = extra_vars.replace("@", "")
             data = load_data_file(extra_vars)
         else:
             data = shlex_kv(extra_vars)
         return data
- 
+
     def go(self):
 
         colorama_init()
-       
-        if len(self.args) < 3 or sys.argv[1] == "--help":
-            print(USAGE)
-            sys.exit(1)
 
-        mode = self.args[1]
-        path = sys.argv[2]
-        callbacks = None
-        extra_vars = dict()
+        common_args_parser = argparse.ArgumentParser(add_help=False)
+        common_args_parser.add_argument('--extra-vars', help="add extra variables from the command line")
+        common_args_parser.add_argument('--limit-groups', help="(with --push) limit groups executed to this comma-separated list of patterns")
+        common_args_parser.add_argument('--limit-hosts', help="(with --push) limit hosts executed to this comma-separated list of patterns")
+        common_args_parser.add_argument('--tags', help='optional comma seperated list of tags')
+        common_args_parser.add_argument('--verbose', action='store_true', help='(with --push) increase verbosity')
+
+        local_or_push_parser = common_args_parser.add_mutually_exclusive_group(required=True)
+        local_or_push_parser.add_argument('--local', action='store_true', help='run in local mode')
+        local_or_push_parser.add_argument('--push', action='store_true', help='run in push mode')
 
         parser = argparse.ArgumentParser()
-        parser.add_argument('--validate', action='store_true', help='policy file to validate')
-        parser.add_argument('--apply', action='store_true', help="policy file to apply")
-        parser.add_argument('--check', action='store_true', help="policy file to check")
-        parser.add_argument('--tags', help='optional comma seperated list of tags')
-        parser.add_argument('--push', action='store_true', help='run in push mode')
-        parser.add_argument('--local', action='store_true', help='run in local mode')
-        parser.add_argument('--verbose', action='store_true', help='(with --push) increase verbosity')
-        parser.add_argument('--extra-vars', help="add extra variables from the command line")
-        parser.add_argument('--limit-groups', help="(with --push) limit groups executed to this comma-separated list of patterns")
-        parser.add_argument('--limit-hosts', help="(with --push) limit hosts executed to this comma-separated list of patterns")
+        subparsers = parser.add_subparsers(dest='cmd', title='subcommands')
+        subparsers.required = True
+        subparsers.add_parser('apply', parents=[common_args_parser], help="apply policy")
+        subparsers.add_parser('check', parents=[common_args_parser], help="check policy")
+        subparsers.add_parser('validate', parents=[common_args_parser], help='validate policy')
+
         args = parser.parse_args(self.args[1:])
 
-        all_modes = [ args.validate, args.apply, args.check ]
-        selected_modes = [ x for x in all_modes if x is True ]
-        if len(selected_modes) != 1:
-            print(selected_modes)
-            print(USAGE)
-            sys.exit(1)
-
-        all_modes = [ args.push, args.local ]
-        selected_modes = [ x for x in all_modes if x is True ]
-        if len(selected_modes) != 1:
-            print(USAGE)
-            sys.exit(1)
-
+        extra_vars = dict()
         if args.extra_vars is not None:
             extra_vars = self.handle_extra_vars(args.extra_vars)
 
-        Callbacks().set_callbacks([ LocalCliCallbacks(), CommonCallbacks() ])
+        Callbacks().set_callbacks([LocalCliCallbacks(), CommonCallbacks()])
         Context().set_verbose(args.verbose)
 
         abspath = os.path.abspath(sys.modules[self.policy.__module__].__file__)
@@ -112,35 +88,24 @@ class Cli(object):
             tags = args.tags.strip().split(",")
 
         api = Api(
-            policies=[self.policy], 
-            tags=tags, 
-            push=args.push, 
-            extra_vars=extra_vars, 
-            limit_groups=args.limit_groups, 
+            policies=[self.policy],
+            tags=tags,
+            push=args.push,
+            extra_vars=extra_vars,
+            limit_groups=args.limit_groups,
             limit_hosts=args.limit_hosts,
             relative_root=relative_root)
 
         try:
-            if args.validate:
-                # just check for missing files and invalid types
-                api.validate()
-            elif args.check:
-                # operate in dry-run mode
-                api.check()
-            elif args.apply:
-                # configure everything
-                api.apply()
-            else:
-                print(USAGE)
-                sys.exit(1)
-        except OpsMopStop as oms:
+            handler = getattr(api, args.cmd)
+            handler()
+        except OpsMopStop:
             sys.exit(1)
         except OpsMopError as ome:
             print("")
             print(str(ome))
             print("")
             sys.exit(1)
-
 
         print("")
         sys.exit(0)
