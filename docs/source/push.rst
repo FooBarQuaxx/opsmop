@@ -17,7 +17,7 @@ While OpsMop policy files written just for "local mode" do *NOT* contain enough 
 in push mode, any push-capable policy file *CAN* be used in local mode with *NO* changes. This is a free bonus, as sometimes you may want to develop
 some automation locally as opposed to against remote systems.
 
-What a push mode example looks like is best understood after first understanding the language in local mode, and then reading 
+What a push mode example looks like is best understood after first understanding the language in local mode, and then reading
 the `push_demo.py <https://github.com/opsmop/opsmop-demo/blob/master/content/push_demo.py>`_ example.
 
 Please review this in another tab while reading the rest of the documentation.
@@ -35,7 +35,7 @@ This happens asynchronously: each host is trying to execute through the role as 
 Along the way, various events occur and are sent back to the remote client, showing realtime status as configuration
 occurs.  All hosts must finish before moving on to the next role.
 
-If any host hits an error, the whole process stops with that role, and does not proceed to future roles.  
+If any host hits an error, the whole process stops with that role, and does not proceed to future roles.
 
 .. _push_cli:
 
@@ -45,8 +45,8 @@ Command Line Usage
 Similar to :ref:`local`, the opsmop command line for push mode is short::
 
     cd opsmop-demo/content
-    python3 filename.py --check --push [--verbose]
-    python3 filename.py --apply --push [--verbose]
+    python3 filename.py check --push [--verbose]
+    python3 filename.py apply --push [--verbose]
 
 Configuration is largely defined in the policy file.  There are other flags, but that's the minimum.
 
@@ -80,12 +80,12 @@ are always required, so don't get overwhelmed at first:
             return ('opsmop', None)
 
         def sudo(self):
-            # optional. 
+            # optional.
             # whether to sudo after logging in. Defaults to False, almost always should be set True.
             return True
 
         def sudo_as(self):
-            # optional. 
+            # optional.
             # username and optionally a password for the sudo account. If not set, consults values in defaults.toml.
             # if no defaults.toml, this uses root and no password.
             return ('root', None)
@@ -108,7 +108,7 @@ are always required, so don't get overwhelmed at first:
 
 .. note::
 
-   In all computer systems, not just OpsMop, SSH connection with keys to untrusted hosts can be insecure, 
+   In all computer systems, not just OpsMop, SSH connection with keys to untrusted hosts can be insecure,
    because that host can read your password. Wherever possible, you should connect by SSH key.
 
 .. note::
@@ -122,10 +122,10 @@ Sudo
 ====
 
 It is worth noting that the sudo operations that happen above happen only once per role.  In fact, existing connections are reused
-between subsequent roles. 
+between subsequent roles.
 
 The most common use of sudo is to log in as a normal account and then sudo to root, rather than allowing SSH to the root account.
-From root, it is easy to trivially execute sudo to less priveledged accounts, if needed, but this is not done with the 'sudo_as' 
+From root, it is easy to trivially execute sudo to less priveledged accounts, if needed, but this is not done with the 'sudo_as'
 methods, you would simply just specify 'sudo' in front of any shell commands.
 
 Or, to put it another way, we expect 'sudo_as' to be used for priveledge escalation about 105% of the time.  This is why you can
@@ -164,7 +164,7 @@ The file has the following format::
 
 
 These values are ignored if specified in the "sudo_as" or "connect_as" methods on the *Role* object.
-         
+
 .. _push_inventory:
 
 Inventory
@@ -212,11 +212,11 @@ you want with it, including subclassing inventory.
 
 Inventory Limits on the Command Line
 ====================================
-       
+
 The inventory groups used can be further limited on the command line as follows::
 
-    python3 push_demo.py --push --apply --limit-groups 'rack1'
-    python3 push_demo.py --push --apply --limit-hosts 'foo.example.com'
+    python3 push_demo.py apply --push --limit-groups 'rack1'
+    python3 push_demo.py apply --push --limit-hosts 'foo.example.com'
 
 This way, it's easy to write generic automation scripts that can target arbitrary inventory, without having to change the policy files.
 It is of course important to remember that, once again, OpsMop is pure python, and you could also do all this dynamically from within the policy file.
@@ -226,7 +226,7 @@ It is of course important to remember that, once again, OpsMop is pure python, a
 Toml Inventory
 ==============
 
-An easy method of keeping inventory in source code is the TOML Inventory, best demonstrated 
+An easy method of keeping inventory in source code is the TOML Inventory, best demonstrated
 by `inventory.toml <https://github.com/opsmop/opsmop-demo/blob/master/content/inventory/inventory.toml>`_.
 
 Variables can be assigned at either host or group level.
@@ -236,7 +236,7 @@ Variables can be assigned at either host or group level.
 Other Inventory Types
 =====================
 
-Additional inventory types classes, particularly for cloud providers, would make excellent contributions to OpsMop.  If you are interested in 
+Additional inventory types classes, particularly for cloud providers, would make excellent contributions to OpsMop.  If you are interested in
 adding one, stop by `talk.msphere.io <talk.msphere.io>`_.
 
 This will likely include cloud providers, querying inventory from configurations, and group membership from tags.  Once complete, setup and usage
@@ -268,8 +268,8 @@ this doesn't make sense for 'opsmop_host'.
 Connection Trees
 ================
 
-Connection trees are an optional feature supported by the underlying library "mitogen" that we use for SSH communications 
-(help is needed testing them!).  
+Connection trees are an optional feature supported by the underlying library "mitogen" that we use for SSH communications
+(help is needed testing them!).
 
 OpsMop (via mitogen) can SSH-connect through multiple-layers of intermediate hosts, in a fan-out architecture.
 
@@ -341,9 +341,9 @@ To access other paths, a method can be added to the change what paths are served
 "." in this case, always means the path of the policy file being executed on the command line.  If any other paths are given,
 they should be referenced as absolute paths by any resources that use them, as shown above.  If an 'allow_fileserving_paths'
 method is not found on the Role, there is also an opportunity to override the default path ('.') by defining a method on the Policy
-class. 
+class.
 
-The basic takeaway here is that each Role has fine grained control over what files may be served up.  
+The basic takeaway here is that each Role has fine grained control over what files may be served up.
 
 
 When the paths are added to the role, checksumming is performed to avoid transferring any files that do not need to be transferred.
@@ -465,7 +465,7 @@ performance, high-host-count, and high-latency scenarios.  However, most feature
 and this is completely usable today.
 
 1. SELinux (enforcing) support is not operational yet and is waiting on enhancements in mitogen. You should
-be able to switch selinux to permissive mode.  Non-SELinux distributions (Debian, Ubuntu, Arch, etc) 
+be able to switch selinux to permissive mode.  Non-SELinux distributions (Debian, Ubuntu, Arch, etc)
 are of course not effected.
 
 2. Connections to hosts are conducted in a threadpool with a default of 16 threaded workers (see :ref:`push_defaults`). If you have a large
@@ -509,7 +509,7 @@ Credits
 Much of the support for push mode in OpsMop comes from the libraries underpinning the implementation, and we would be remiss to not give them
 due credit for makings these features much easier to implement.
 
-OpsMop SSH features, including sudo support, file transfer, dependency transfers, remote error handling, and multi-tier connections 
+OpsMop SSH features, including sudo support, file transfer, dependency transfers, remote error handling, and multi-tier connections
 are all powered by `mitogen <https://mitogen.readthedocs.io/en/latest/>`_.
 
 Additionally, heavy use is made of `dill <https://pypi.org/project/dill/>`_ for serialization of python objects.

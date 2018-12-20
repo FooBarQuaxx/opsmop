@@ -14,7 +14,7 @@ Setup
 Python 3
 --------
 
-OpsMop requires Python 3.  
+OpsMop requires Python 3.
 
 .. _python3_linux:
 
@@ -35,7 +35,7 @@ If not already installed, use Homebrew::
     brew install Python
 
 And::
-    
+
     # vim ~/.bashrc
     export path=/usr/local/bin:$PATH
     alias python /usr/local/bin/python3
@@ -55,7 +55,7 @@ And::
 Pip Install
 -----------
 
-On your platform, python 3 pip may be named 'pip3' or something like 'pip-3.6' or 'pip-3.7'.  
+On your platform, python 3 pip may be named 'pip3' or something like 'pip-3.6' or 'pip-3.7'.
 Please make sure you use Python 3's pip as OpsMop is a Python 3 application/library.
 
 To install OpsMop directly from pip::
@@ -90,9 +90,9 @@ Checkout The Demo Repo
 The 'opsmop-demo' repo contains OpsMop learning examples.  Many are abstract and do not install
 real things, but they are there to teach you about the language and the tools::
 
-    git clone https://github.com/opsmop/opsmop-demo.git 
+    git clone https://github.com/opsmop/opsmop-demo.git
 
-.. _first_test:	
+.. _first_test:
 
 Trying Things Out
 -----------------
@@ -101,9 +101,9 @@ The other chapters will explain opsmop in greater depth, but let's see
 if this works, just running from source::
 
     cd opsmop-demo/content
-    PYTHONPATH=/path/for/checkout/of/opsmop python3 hello.py --local --apply
-    
-.. _pypi:	
+    PYTHONPATH=/path/for/checkout/of/opsmop python3 hello.py apply --local
+
+.. _pypi:
 
 What About PyPi?
 ----------------

@@ -14,18 +14,18 @@ are optional.  These are the features that you should learn second, or maybe thi
 trying out a few modules.
 
 Many simple configurations in OpsMop may simply use modules like
-:ref:`module_service`, :ref:`module_package`, and :ref:`module_file`, and 
+:ref:`module_service`, :ref:`module_package`, and :ref:`module_file`, and
 will not need all of these features, but it is also likely that every OpsMop
 configuration will want to use at least some of the features explained below.
 
 OpsMop encourages random-access learning.
 
-The language examples below will refer to many modules detailed further in the :ref:`modules` section, so 
+The language examples below will refer to many modules detailed further in the :ref:`modules` section, so
 feel free to jump back and forth. The best way to understand these features is to consult
-the `opsmop-demo <https://github.com/opsmop/opsmop-demo>`_ repo on GitHub, and also as you 
+the `opsmop-demo <https://github.com/opsmop/opsmop-demo>`_ repo on GitHub, and also as you
 read through :ref:`modules`, you will see some of these features used in the examples in context.
 
-Many of the examples are contrived and don't deploy real applications, but are constructed to teach 
+Many of the examples are contrived and don't deploy real applications, but are constructed to teach
 lessons about things such as :ref:`var_scoping` or :ref:`conditionals`.  Real OpsMop policies
 for deploying an application stack would be a bit longer and would use a larger mixture of modules in concert.
 
@@ -68,7 +68,7 @@ to install a package from Python's pip?
 To specify or force a specific provider:
 
 .. code-block:: python
-    
+
     def set_resources(self):
         return Resources(
             Package(name="pygments", method="pip")
@@ -93,7 +93,7 @@ Expressing that full path for the provider name is verbose (and subject to typos
 to improve readability.
 
 .. code-block:: python
-    
+
     Package(name="cowsay", method=SPORK)
 
 .. note:
@@ -116,7 +116,7 @@ Variable Scoping
 OpsMop uses variables in both templates and conditionals.
 
 We've already talked a little bit about variables, and knowledge of variables weighs in on
-future sections and nearly everything in OpsMop.  
+future sections and nearly everything in OpsMop.
 
 It is important to not confuse Python variables with OpsMop variables.  To transfer a Python class variable
 or global variable into OpsMop template space, use :ref:`module_set`.
@@ -127,7 +127,7 @@ down, but changing a variable inside a scope does not effect the value at the ou
 These variables are 'scope-local'.
 
 In the opsmop-demo repository, `var_scoping.py <https://github.com/opsmop/opsmop-demo/blob/master/content/var_scoping.py>`_ demonstrates
-the various variable scopes in OpsMop. 
+the various variable scopes in OpsMop.
 
 Because this is a long example, we'll refer you to GitHub and ask you to read and perhaps run the example. In browsing
 the source, you will understand more about what is possible with variable scopes.
@@ -161,7 +161,7 @@ returns a string.  Here is a contrived example:
 
 In the above example, 'c' would be set to the number 5, not the string "5" (or worse, the string "23")
 
-Where would you use this directly? Probably not very often. 
+Where would you use this directly? Probably not very often.
 
 Eval is used to implement :ref:`conditionals`, described below.
 
@@ -170,7 +170,7 @@ Eval is used to implement :ref:`conditionals`, described below.
 Conditions
 ==========
 
-Any role, policy, or resource can be given a conditional.  If the conditional is true, that object 
+Any role, policy, or resource can be given a conditional.  If the conditional is true, that object
 will be skipped during the check or apply phase.
 
 Expressions are specified with "when=", and accept valid `Jinja2 <http://jinja.pocoo.org/docs/>`_ expressions.  This is technically
@@ -178,7 +178,7 @@ implemented using :ref:`eval` but leaving off Eval is provided as syntactic suga
 
 .. code-block:: python
 
-    # ...    
+    # ...
     Shell("reboot", when="a > b")
     # ...
 
@@ -224,7 +224,7 @@ a resource:
 Nested Scopes
 =============
 
-Resources in OpsMop can be nested, to attach variables at different scopes.  This is best demoed by 
+Resources in OpsMop can be nested, to attach variables at different scopes.  This is best demoed by
 `var_scoping.py <https://github.com/opsmop/opsmop-demo/blob/master/content/var_scoping.py>`_ which is a very
 arbitrary demo but shows how it is done.
 
@@ -233,7 +233,7 @@ arbitrary demo but shows how it is done.
 Registration
 ============
 
-The value of one command can easily be saved and fed into the output of another. 
+The value of one command can easily be saved and fed into the output of another.
 
 This value is entered into local scope:
 
@@ -258,12 +258,12 @@ Some of these examples are shown in the 'opsmop-demo' repo.
    are not limited by creating them all at once. You can always pick whatever style you prefer.
 
 .. note:
-    Using Echo to show templates on the screen is a useful debug technique, but the :ref:`module_debug` module 
+    Using Echo to show templates on the screen is a useful debug technique, but the :ref:`module_debug` module
     is often easier.  Echo makes more sense for specific messages like "we're about to take down the
     fence power in the velociraptor exhibit".
 
 .. note:
-    Registration is most commonly used with shell commands. Most resources will probably not have very interesting 
+    Registration is most commonly used with shell commands. Most resources will probably not have very interesting
     return data to use with 'register'.
 
 .. note:
@@ -277,12 +277,12 @@ Tags
 ====
 
 OpsMop Tags are a feature where any certain resources in OpsMop can be selectively triggered without running all
-of the other resources in the policy file.  
+of the other resources in the policy file.
 
 .. code-block:: python
 
     class DemoPolicy(Policy):
-    
+
         def set_roles(self):
 
             return Roles(
@@ -293,7 +293,7 @@ of the other resources in the policy file.
 In the above example, if the opsmop binary was invoked with "-\\-tags=security", only the security role
 would be processed.
 
-The special tag name 'any' triggers regardless of what is specified with '-\\-tags'.  
+The special tag name 'any' triggers regardless of what is specified with '-\\-tags'.
 
 Tags can be assigned to any resource or collection and automatically apply to all contained resources.
 This is best demonstrated by the `tags.py <https://github.com/opsmop/opsmop-demo/blob/master/content/basics.py>`_ demo in the `opsmop-demo <https://github.com/opsmop/opsmop-demo>`_ repo.
@@ -312,7 +312,7 @@ command.  This is demoed in the :ref:`module_shell` documentation.
     def resources(self):
         return Resources(
             Shell("ls foo | wc -l", register="line_count", ignore_errors=True),
-            Echo("line_count.data")    
+            Echo("line_count.data")
         )
 
 
@@ -332,7 +332,7 @@ should possibly depend on specific return codes or output. The state can be over
     Shell("/bin/foo --args", register="x", changed_when=Eval("'changed' in x.data"), notify="some_step")
 
 If not using handlers, the change reporting isn't too significant, but is still useful to record whether or not
-the policy evaluation made any changes. 
+the policy evaluation made any changes.
 
 If no 'changed_when' clause is added to the Shell resource, it will always record that it made a change.
 
@@ -341,9 +341,9 @@ If no 'changed_when' clause is added to the Shell resource, it will always recor
 Failure Status Overrides
 ========================
 
-By default, if a resource returns a fatal error, the program will halt at that point. What causes an error like this? 
+By default, if a resource returns a fatal error, the program will halt at that point. What causes an error like this?
 Errors could be a non-zero exit code from the :ref:`module_shell`, or any other time a provider might return a failed result that is not
-a runtime exception. 
+a runtime exception.
 
 The problem is, sometimes return codes are not reliable.  Other times, return codes are not enough.
 
@@ -354,7 +354,7 @@ Here are a few examples of controlling when a resource should be considered fail
     Shell("/bin/foo --args", register="x", failed_when=Eval("x.rc != 5")
 
 .. code-block:: python
-    
+
     Shell("/bin/foo --args", register="x", failed_when=Eval("x.rc != 0 or not 'SUCCESS' in x.data"))
 
 It may also be clearer to save that conditional string to a class or
@@ -398,7 +398,7 @@ pre()
 
 The opposite of post().
 
-A pre method would be called prior to evaluating a role in either check or apply mode. 
+A pre method would be called prior to evaluating a role in either check or apply mode.
 
 The most trivial use of pre might be to print a quick message when entering a role, without relying on :ref:`module_echo`.
 
@@ -408,7 +408,7 @@ The most trivial use of pre might be to print a quick message when entering a ro
 should_process_when()
 ~~~~~~~~~~~~~~~~~~~~~
 
-This is powerful. This method is called to decide whether a resource should be executed at all. 
+This is powerful. This method is called to decide whether a resource should be executed at all.
 
 In the example `user_facts.py <https://github.com/opsmop/opsmop-demo/blob/master/content/user_facts.py>`
 we cleverly use should_process_when() to implement feature flags - a given *Role* skips entirely when a fact is not set.
@@ -431,17 +431,17 @@ any variable value in OpsMop.
 
 Examples::
 
-    python3 deploy.py --apply --push --extra-vars "version=1.2.3.4 package=foo"
+    python3 deploy.py apply --push --extra-vars "version=1.2.3.4 package=foo"
 
-    python3 deploy.py --apply --push --extra-vars @vespene.json
+    python3 deploy.py apply --push --extra-vars @vespene.json
 
 Using the "@" symbol allows variables to be loaded from a file.  ".json", ".toml", and ".yaml" files are all readable, assuming they have the appropriate extensions.
 
 This feature is ideally suited for integration with `Vespene <http://docs.vespene.io/>`_ when taking advantage of `Vespene Launch Questions <http://docs.vespene.io/launch_questions.html>`_
-to provide a friendly, accessed controlled web console for all kinds of IT automation tasks. Vespene generates a JSON file called "vespene.json" automatically in each build root, containing all the 
+to provide a friendly, accessed controlled web console for all kinds of IT automation tasks. Vespene generates a JSON file called "vespene.json" automatically in each build root, containing all the
 variables set up in UI and supplied by the user.
 
-If you happen to use another CI/CD server or operations GUI, similar concepts will also work to inject variable values into your scripts. The other way to provide 
+If you happen to use another CI/CD server or operations GUI, similar concepts will also work to inject variable values into your scripts. The other way to provide
 variable data is :ref:`push_inventory`.
 
 Next Steps

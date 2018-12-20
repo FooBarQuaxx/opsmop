@@ -1,12 +1,12 @@
 
 # Copyright 2018 Michael DeHaan LLC, <michael@michaeldehaan.net>
-# 
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
 #    http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -23,8 +23,8 @@ USAGE = """
 |
 | opsmop - (C) 2018, Michael DeHaan LLC
 |
-| opsmop-push --check demo/policy.py 
-| opsmop-push --apply demo/policy.py 
+| python3 demo/policy.py check --push
+| python3 demo/policy.py apply --push
 |
 """
 
@@ -37,9 +37,9 @@ class PushCli(object):
         The CLI is constructed with the sys.argv command line, see bin/opsmop-push
         """
         self.args = args
- 
+
     def go(self):
-       
+
         if len(self.args) < 3 or sys.argv[1] == "--help":
             print(USAGE)
             sys.exit(1)
@@ -60,9 +60,9 @@ class PushCli(object):
             sys.exit(1)
 
         path = args.check or args.apply
-        
+
         api = PushApi.from_file(path=path) #, transport=<SshTransport>
-        
+
         try:
             if args.check:
                 # operate in dry-run mode
